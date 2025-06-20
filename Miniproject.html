@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DOM Calculator</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"rel="stylesheet">
+  <style>
+    body {
+      background: #19758c;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .calculator {
+      background: rgb(43, 28, 28);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(66, 43, 43, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    .output {
+      font-size: 1.5rem;
+      margin-bottom: 10;
+      word-break: break-all;
+    }
+    .btn {
+      font-size: 1.2rem;
+    }
+  </style>
+  
+</head>
+<body>
+
+<script>
+  
+  const container = document.createElement('div');
+  container.className = 'calculator container';
+
+  
+  const display = document.createElement('div');
+  display.className = 'output form-control text-end mb-3';
+  display.id = 'display';
+  display.textContent = '';
+  container.appendChild(display);
+
+  
+  const buttons = [
+    ['7','8','9','/'],
+    ['4','5','6','*'],
+    ['1','2','3','-'],
+    ['0','.','MC','+'],
+    ['=','M-','M+','%'],
+    ['C']
+  ];
+
+  const buttonGrid = document.createElement('div');
+  buttonGrid.className = 'row g-2';
+
+  buttons.forEach(row => {
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'd-flex justify-content-between';
+
+    row.forEach(label => {
+      const btn = document.createElement('button');
+      btn.textContent = label;
+      btn.className = 'btn btn-outline-primary flex-fill mx-1';
+      btn.addEventListener('click', () => handleInput(label));
+      rowDiv.appendChild(btn);
+    });
+
+    buttonGrid.appendChild(rowDiv);
+  });
+
+  container.appendChild(buttonGrid);
+  document.body.appendChild(container);
+
+  
+  let memory = parseFloat(localStorage.getItem('calcMemory') || '0');
+
+  function handleInput(val) {
+    const d = display;
+
+    if (val === 'C') {
+      d.textContent = '';
+    } else if (val === '=') {
+      try {
+        d.textContent = eval(d.textContent);
+      } catch (e) {
+        alert('Invalid expression');
+      }
+    } else if (val === 'M+') {
+      memory += parseFloat(d.textContent) || 0;
+      localStorage.setItem('calcMemory', memory);
+    } else if (val === 'M-') {
+      memory -= parseFloat(d.textContent) || 0;
+      localStorage.setItem('calcMemory', memory);
+    } else if (val === 'MC') {
+      memory = 0;
+      localStorage.setItem('calcMemory', memory);
+    } else {
+      d.textContent += val;
+    }
+}
+
+  window.addEventListener('keydown', e => {
+    const numAllowed = /^[0-9]$/;
+    if (numAllowed.test(e.key)) {
+      display.textContent += e.key;
+    } else {
+      alert('Only numbers are allowed');
+      e.preventDefault();
+    }
+  });
+</script>
+
+
+<script>
+  function assert(condition, message) {
+    if (!condition) {
+      console.error(' Test Failed:', message);
+    } else {
+      console.log(' Test Passed:', message);
+    }
+  }
+
+  setTimeout(() => {
+    assert(document.querySelector('.calculator') !== null, 'Calculator container exists');
+    assert(document.getElementById('display') !== null, 'Display exists');
+    assert(document.querySelectorAll('button').length > 0, 'Buttons are rendered');
+    assert(typeof handleInput === 'function', 'handleInput function is defined');
+    document.getElementById('display').textContent = '10+5';
+    handleInput('=');
+    assert(document.getElementById('display').textContent === '15', 'Expression evaluates correctly');
+  }, 500);
+</script>
+
+</body>
+</html>
+
+
